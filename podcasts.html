@@ -495,6 +495,10 @@
     text-transform: uppercase;
     z-index: 3;
     box-shadow: 2px 2px 0 var(--navy-deep);
+    transition: opacity .25s ease;
+  }
+  .episode-number.loading-badge {
+    opacity: 0.55;
   }
 
   .episode-body {
@@ -878,7 +882,7 @@
     <span class="section-tag">Don't miss an episode</span>
     <h2 class="section-title">Subscribe on <em>YouTube.</em></h2>
     <p class="sub-lead">Get notified every time a new conversation drops. Hit the bell, share with a friend, and keep the conversation going.</p>
-    <a href="https://www.youtube.com/playlist?list=PLBExKBRRwO8UK9zWROGOVrcxzUHkWYpm_" target="_blank" rel="noopener" class="yt-btn">
+    <a href="https://www.youtube.com/@RedeemingConversations" target="_blank" rel="noopener" class="yt-btn">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
       Subscribe on YouTube
     </a>
@@ -946,8 +950,9 @@
     'DxydQf8kuw0',
     'sCzaPTjUCUQ',
     '9pXwTVQSP2s',
-    'LGxf4tJdADQ'
-    
+    'LGxf4tJdADQ',
+    'JiHGd_LF5s8',
+    '26YSzY1x7KU'
   ];
 
   // ===== Scroll reveal =====
@@ -1010,24 +1015,34 @@
   });
 
   // ===== Build episode tiles =====
+  // VIDEOS is in chronological order (oldest first). We render in reverse
+  // so the most recent episode appears at the top. Episode numbering is
+  // computed from the chronological order so the OLDEST episode is Ep 01.
+  // Two-part conversations (titles containing "Part 1" / "Part 2") share
+  // a single base episode number with -1 / -2 suffixes (e.g. EP 04-1, EP 04-2).
   const grid = document.getElementById('episodes-grid');
-  document.getElementById('ep-count').textContent = VIDEOS.length;
+  const epCountEl = document.getElementById('ep-count');
 
-  VIDEOS.forEach((videoId, i) => {
-    const epNum = i + 1;
+  // Build cards immediately in reverse chronological order so the page
+  // doesn't sit empty while titles fetch. Badges start as placeholders
+  // and get updated once titles arrive (so Part 1/Part 2 can be detected).
+  const cardsByChrono = []; // index = chronological position (0 = oldest)
+
+  for (let chrono = VIDEOS.length - 1; chrono >= 0; chrono--) {
+    const videoId = VIDEOS[chrono];
     const card = document.createElement('article');
     card.className = 'episode-card';
     card.tabIndex = 0;
     card.setAttribute('role', 'button');
     card.dataset.video = videoId;
+    card.dataset.chrono = String(chrono);
 
-    // maxresdefault works for most videos; falls back to hqdefault if missing
     const thumbHi = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
     const thumbLo = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
     card.innerHTML = `
       <div class="episode-thumb">
-        <span class="episode-number">Ep ${String(epNum).padStart(2, '0')}</span>
+        <span class="episode-number loading-badge">Ep —</span>
         <img src="${thumbHi}" alt="" loading="lazy"
              onerror="if(this.src!=='${thumbLo}'){this.src='${thumbLo}';}">
         <div class="play-overlay">
@@ -1047,7 +1062,7 @@
 
     const open = () => {
       const titleEl = card.querySelector('.episode-title');
-      const title = titleEl.dataset.title || titleEl.textContent || `Episode ${epNum}`;
+      const title = titleEl.dataset.title || titleEl.textContent || `Episode ${chrono + 1}`;
       openLightbox(videoId, title);
     };
     card.addEventListener('click', open);
@@ -1056,7 +1071,8 @@
     });
 
     grid.appendChild(card);
-  });
+    cardsByChrono[chrono] = card;
+  }
 
   // ===== Fetch titles via YouTube oEmbed (works without API key) =====
   async function fetchTitle(videoId) {
@@ -1071,24 +1087,72 @@
     }
   }
 
-  async function populateTitles() {
-    // Fetch in parallel for speed
-    const titleEls = document.querySelectorAll('.episode-title.loading');
-    await Promise.all(
-      Array.from(titleEls).map(async (el, i) => {
-        const videoId = el.dataset.video;
-        const title = await fetchTitle(videoId);
-        const fallback = `Episode ${i + 1}`;
-        const finalTitle = title || fallback;
-        el.textContent = finalTitle;
-        el.dataset.title = finalTitle;
-        el.classList.remove('loading');
-        el.removeAttribute('aria-label');
-      })
-    );
+  // Detect "Part N", "Pt N", "Pt. N" anywhere in the title (case-insensitive).
+  function detectPartNumber(title) {
+    if (!title) return null;
+    const m = title.match(/\b(?:part|pt\.?)\s*(\d+)\b/i);
+    return m ? parseInt(m[1], 10) : null;
   }
 
-  populateTitles();
+  // Compute episode labels in chronological order.
+  // Part 1 starts a new episode number; Part 2+ reuses the previous one.
+  function computeLabels(titles) {
+    const labels = new Array(titles.length);
+    let baseEp = 0;
+    let lastWasPart = false;
+
+    for (let i = 0; i < titles.length; i++) {
+      const partNum = detectPartNumber(titles[i]);
+      if (partNum === null) {
+        baseEp++;
+        labels[i] = `Ep ${String(baseEp).padStart(2, '0')}`;
+        lastWasPart = false;
+      } else if (partNum === 1 || !lastWasPart) {
+        // Part 1 (or a stray Part N with no preceding Part 1) — start a new ep
+        baseEp++;
+        labels[i] = `Ep ${String(baseEp).padStart(2, '0')}-${partNum}`;
+        lastWasPart = true;
+      } else {
+        // Part 2 or higher, continuing the previous episode
+        labels[i] = `Ep ${String(baseEp).padStart(2, '0')}-${partNum}`;
+        lastWasPart = true;
+      }
+    }
+
+    return { labels, baseEpCount: baseEp };
+  }
+
+  async function populateTitlesAndLabels() {
+    // Fetch all titles in parallel for speed
+    const titles = await Promise.all(VIDEOS.map(fetchTitle));
+
+    // Compute labels using chronological order
+    const safeTitles = titles.map((t, i) => t || `Episode ${i + 1}`);
+    const { labels, baseEpCount } = computeLabels(safeTitles);
+
+    // Update the episode count to reflect collapsed parts
+    epCountEl.textContent = baseEpCount;
+
+    // Update each card's title and badge
+    for (let chrono = 0; chrono < VIDEOS.length; chrono++) {
+      const card = cardsByChrono[chrono];
+      if (!card) continue;
+
+      const titleEl = card.querySelector('.episode-title');
+      const badgeEl = card.querySelector('.episode-number');
+      const finalTitle = safeTitles[chrono];
+
+      titleEl.textContent = finalTitle;
+      titleEl.dataset.title = finalTitle;
+      titleEl.classList.remove('loading');
+      titleEl.removeAttribute('aria-label');
+
+      badgeEl.textContent = labels[chrono];
+      badgeEl.classList.remove('loading-badge');
+    }
+  }
+
+  populateTitlesAndLabels();
 </script>
 
 </body>
