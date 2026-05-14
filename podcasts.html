@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podcasts — Redeeming Conversations</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1c3a6e;
+    --navy-deep: #122749;
+    --blue: #2563b8;
+    --orange: #f59021;
+    --orange-deep: #e07514;
+    --yellow: #fbc02d;
+    --cream: #fdf6e8;
+    --cream-soft: #f6ead0;
+    --ink: #0f1f3a;
+    --ink-soft: #3d4f6b;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+  }
+
+  /* ===== NAV ===== */
+  header.site-nav {
+    border-bottom: 3px solid var(--navy);
+    background: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 0 var(--yellow);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+  }
+
+  .logo { display: inline-block; text-decoration: none; transition: transform .25s ease; line-height: 0; }
+  .logo:hover { transform: rotate(-2deg) scale(1.05); }
+  .logo img { height: 56px; width: auto; display: block; }
+  @media (max-width: 880px) { .logo img { height: 44px; } }
+
+  .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+
+  .nav-links a {
+    color: var(--navy);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color .2s ease;
+  }
+
+  .nav-links a:not(.donate-btn)::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -6px;
+    width: 0; height: 3px;
+    background: var(--orange);
+    transition: width .25s ease;
+  }
+  .nav-links a:not(.donate-btn):hover::after { width: 100%; }
+  .nav-links a:not(.donate-btn):hover { color: var(--orange-deep); }
+  .nav-links a.current { color: var(--orange-deep); }
+  .nav-links a.current::after { width: 100%; }
+
+  .donate-btn {
+    background: var(--orange);
+    color: var(--white) !important;
+    padding: 12px 24px;
+    border-radius: 999px;
+    box-shadow: 0 4px 0 var(--orange-deep);
+    transition: all .2s ease;
+  }
+  .donate-btn:hover {
+    background: var(--yellow);
+    color: var(--navy) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--orange-deep);
+  }
+  .donate-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--orange-deep); }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    color: var(--cream);
+    padding: 16px 32px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    box-shadow: 0 5px 0 var(--navy-deep);
+    transition: all .2s ease;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 7px 0 var(--navy-deep); }
+  .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--navy-deep); }
+  .btn-primary svg { transition: transform .2s ease; }
+  .btn-primary:hover svg { transform: translateX(4px); }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--navy);
+    padding: 14px 30px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    border: 2px solid var(--navy);
+    transition: all .2s ease;
+  }
+  .btn-ghost:hover { background: var(--navy); color: var(--cream); }
+
+  /* ===== HERO ===== */
+  .pod-hero {
+    padding: 90px 0 80px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 75% 30%, rgba(251, 192, 45, 0.28) 0%, transparent 55%),
+      radial-gradient(ellipse at 15% 80%, rgba(245, 144, 33, 0.18) 0%, transparent 55%),
+      var(--cream);
+  }
+  .pod-hero::before {
+    content: "";
+    position: absolute;
+    top: 20%; right: -120px;
+    width: 320px; height: 320px;
+    background: var(--yellow);
+    border-radius: 50%;
+    opacity: 0.28;
+    animation: float 9s ease-in-out infinite;
+  }
+  .pod-hero::after {
+    content: "";
+    position: absolute;
+    bottom: -100px; left: -80px;
+    width: 240px; height: 240px;
+    background: var(--orange);
+    border-radius: 50%;
+    opacity: 0.22;
+    animation: float 11s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -30px) scale(1.05); }
+  }
+
+  .pod-hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 70px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    color: var(--yellow);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 28px;
+    animation: bounceIn .6s ease-out;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+  @keyframes bounceIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .pod-hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(44px, 6.5vw, 86px);
+    line-height: 0.98;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--navy);
+    margin-bottom: 28px;
+  }
+  .pod-hero h1 .accent-word {
+    color: var(--orange);
+    font-style: italic;
+    font-weight: 500;
+    position: relative;
+    display: inline-block;
+  }
+  .pod-hero h1 .accent-word::after {
+    content: "";
+    position: absolute;
+    left: -4%; right: -4%; bottom: 6%;
+    height: 18%;
+    background: var(--yellow);
+    z-index: -1;
+    opacity: 0.55;
+    transform: skewX(-8deg);
+  }
+
+  .pod-hero p.lead {
+    font-size: 19px;
+    color: var(--ink-soft);
+    max-width: 520px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* ===== MIC VISUAL ===== */
+  .mic-visual {
+    position: relative;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mic-stage { width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center; }
+
+  .wave {
+    position: absolute;
+    border: 3px solid var(--navy);
+    border-radius: 50%;
+    opacity: 0;
+    animation: ripple 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+  }
+  .wave:nth-child(1) { width: 220px; height: 220px; animation-delay: 0s; }
+  .wave:nth-child(2) { width: 220px; height: 220px; animation-delay: 1.05s; border-color: var(--orange); }
+  .wave:nth-child(3) { width: 220px; height: 220px; animation-delay: 2.1s; border-color: var(--yellow); border-width: 4px; }
+  @keyframes ripple {
+    0%   { transform: scale(0.55); opacity: 0; }
+    15%  { opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .mic-body {
+    position: relative;
+    width: 200px; height: 280px;
+    z-index: 3;
+    filter: drop-shadow(8px 10px 0 var(--navy));
+    animation: micBob 4s ease-in-out infinite;
+  }
+  @keyframes micBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-8px) rotate(2deg); }
+  }
+  .mic-svg { width: 100%; height: 100%; }
+
+  .float-dot {
+    position: absolute;
+    border-radius: 50%;
+    animation: bob 5s ease-in-out infinite;
+    z-index: 2;
+  }
+  .float-dot.d1 { width: 18px; height: 18px; background: var(--orange); top: 12%; left: 18%; animation-delay: 0s; }
+  .float-dot.d2 { width: 10px; height: 10px; background: var(--yellow); top: 22%; right: 14%; animation-delay: .8s; }
+  .float-dot.d3 { width: 14px; height: 14px; background: var(--blue); bottom: 14%; left: 8%; animation-delay: 1.6s; }
+  .float-dot.d4 { width: 22px; height: 22px; background: var(--yellow); bottom: 20%; right: 8%; animation-delay: 2.4s; opacity: .85; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+
+  /* ===== SECTIONS ===== */
+  section { padding: 100px 0; position: relative; }
+  .section-cream-soft { background: var(--cream-soft); }
+
+  .section-header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .section-tag {
+    display: inline-block;
+    background: var(--yellow);
+    color: var(--navy);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    color: var(--navy);
+  }
+  .section-title em { font-style: italic; color: var(--orange); }
+
+  .section-intro {
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  /* ===== EPISODES GRID ===== */
+  .episodes-section { padding: 80px 0 100px; }
+
+  .episodes-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .episode-count {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .episode-count strong {
+    color: var(--navy);
+    font-size: 20px;
+    margin-right: 4px;
+  }
+
+  .episodes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  @media (max-width: 980px) { .episodes-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; } }
+  @media (max-width: 640px) { .episodes-grid { grid-template-columns: 1fr; gap: 24px; } }
+
+  .episode-card {
+    background: var(--white);
+    border: 3px solid var(--navy);
+    position: relative;
+    transition: all .3s cubic-bezier(.2, .8, .2, 1);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .episode-card::before {
+    content: "";
+    position: absolute;
+    bottom: -3px; left: -3px; right: -3px;
+    height: 8px;
+    background: var(--orange);
+    transition: height .25s ease;
+    z-index: 4;
+  }
+
+  .episode-card:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 7px 7px 0 var(--navy);
+  }
+  .episode-card:hover::before { height: 18px; background: var(--yellow); }
+
+  .episode-card:focus-visible {
+    outline: 3px solid var(--orange);
+    outline-offset: 4px;
+  }
+
+  .episode-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--navy);
+    border-bottom: 3px solid var(--navy);
+  }
+
+  .episode-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+  }
+  .episode-card:hover .episode-thumb img { transform: scale(1.06); }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(28, 58, 110, 0);
+    transition: background .25s ease;
+    z-index: 2;
+  }
+  .episode-card:hover .play-overlay { background: rgba(28, 58, 110, 0.4); }
+
+  .play-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--orange);
+    border: 3px solid var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 0 var(--navy-deep);
+    transition: all .25s cubic-bezier(.2, .8, .2, 1);
+    transform: scale(0.85);
+    opacity: 0.95;
+  }
+  .episode-card:hover .play-btn {
+    transform: scale(1.08);
+    background: var(--yellow);
+    box-shadow: 0 7px 0 var(--navy-deep);
+  }
+  .play-btn svg {
+    width: 26px;
+    height: 26px;
+    fill: var(--navy);
+    margin-left: 4px;
+  }
+
+  .episode-number {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--navy);
+    color: var(--yellow);
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    z-index: 3;
+    box-shadow: 2px 2px 0 var(--navy-deep);
+  }
+
+  .episode-body {
+    padding: 22px 24px 26px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .episode-title {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+    min-height: calc(19px * 1.3 * 2);
+  }
+
+  .episode-title.loading {
+    color: transparent;
+    background:
+      linear-gradient(90deg,
+        rgba(28,58,110,0.08) 0%,
+        rgba(28,58,110,0.15) 50%,
+        rgba(28,58,110,0.08) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+    height: 48px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .episode-watch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--navy);
+    transition: gap .2s ease, color .2s ease;
+  }
+  .episode-card:hover .episode-watch {
+    gap: 14px;
+    color: var(--orange-deep);
+  }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(15, 31, 58, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    opacity: 0;
+    transition: opacity .25s ease;
+    backdrop-filter: blur(6px);
+  }
+  .lightbox.open { display: flex; opacity: 1; }
+
+  .lightbox-inner {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    transform: scale(0.96);
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+  }
+  .lightbox.open .lightbox-inner { transform: scale(1); }
+
+  .lightbox-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background: #000;
+    border: 4px solid var(--cream);
+    box-shadow: 12px 12px 0 var(--orange);
+  }
+  .lightbox-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: -56px;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--orange);
+    border: 3px solid var(--cream);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 4px 0 var(--orange-deep);
+  }
+  .lightbox-close:hover {
+    transform: rotate(90deg);
+    background: var(--yellow);
+    color: var(--navy);
+  }
+  .lightbox-close svg { width: 22px; height: 22px; }
+
+  .lightbox-caption {
+    margin-top: 20px;
+    color: var(--cream);
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    line-height: 1.4;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @media (max-width: 640px) {
+    .lightbox { padding: 16px; }
+    .lightbox-close { top: -48px; width: 38px; height: 38px; }
+  }
+
+  /* ===== SUBSCRIBE STRIP ===== */
+  .subscribe-strip {
+    background: var(--navy);
+    color: var(--cream);
+    padding: 90px 0;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .subscribe-strip::before {
+    content: "";
+    position: absolute;
+    top: -120px; right: -100px;
+    width: 380px; height: 380px;
+    background: var(--orange);
+    border-radius: 50%;
+    opacity: 0.13;
+  }
+  .subscribe-strip::after {
+    content: "";
+    position: absolute;
+    bottom: -160px; left: -100px;
+    width: 360px; height: 360px;
+    background: var(--yellow);
+    border-radius: 50%;
+    opacity: 0.10;
+  }
+  .subscribe-strip .container { position: relative; z-index: 2; }
+  .subscribe-strip .section-tag { background: var(--orange); color: var(--white); }
+  .subscribe-strip .section-title { color: var(--cream); }
+  .subscribe-strip .section-title em { color: var(--yellow); }
+
+  .subscribe-strip .sub-lead {
+    font-size: 18px;
+    color: rgba(253, 246, 232, 0.85);
+    max-width: 560px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+
+  .yt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #ff0000;
+    color: var(--white);
+    padding: 18px 36px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    box-shadow: 0 5px 0 #b00000;
+    transition: all .2s ease;
+  }
+  .yt-btn:hover { background: #ff2222; transform: translateY(-2px); box-shadow: 0 7px 0 #b00000; }
+  .yt-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b00000; }
+  .yt-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--navy-deep);
+    color: rgba(253, 246, 232, 0.75);
+    padding: 80px 0 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  footer::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(to right, var(--orange) 0%, var(--yellow) 50%, var(--orange) 100%);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 50px;
+  }
+
+  footer h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--cream);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  footer h4 .dot { color: var(--orange); }
+
+  footer p, footer a {
+    color: rgba(253, 246, 232, 0.75);
+    font-size: 14px;
+    line-height: 1.8;
+    text-decoration: none;
+    transition: color .2s ease;
+  }
+  footer a:hover { color: var(--yellow); }
+
+  .footer-donate {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--orange) !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 13px;
+    margin-top: 8px;
+    transition: gap .2s ease;
+  }
+  .footer-donate:hover { gap: 14px; color: var(--yellow) !important; }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(253, 246, 232, 0.15);
+    padding-top: 24px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 880px) {
+    section { padding: 70px 0; }
+    .pod-hero { padding: 60px 0 60px; }
+    .pod-hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .mic-visual { max-width: 360px; margin: 0 auto; }
+    .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+    .nav-links { gap: 14px; }
+    .nav-links a:not(.donate-btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="site-nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo" aria-label="Redeeming Conversations">
+      <img src="logo.png" alt="Redeeming Conversations">
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#why">Why</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#speakers">Speakers</a></li>
+      <li><a href="index.html#blog">Blog</a></li>
+      <li><a href="podcasts.html" class="current">Podcasts</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="https://www.canadahelps.org/en/charities/jesus-great-commission-church-of-calgary/" class="donate-btn" target="_blank" rel="noopener">Donate</a></li>
+    </ul>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="pod-hero">
+  <div class="container pod-hero-grid">
+    <div>
+      <span class="eyebrow">The Gentle Answers Podcast</span>
+      <h1>Conversations <span class="accent-word">worth</span> having.</h1>
+      <p class="lead">Watch and listen as we tackle the questions Christians get asked but feel unequipped to answer — on faith, sexuality, gender, culture, and the gospel. Practical, winsome, biblical.</p>
+      <div class="hero-ctas">
+        <a href="#episodes" class="btn-primary">
+          Browse Episodes
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </a>
+        <a href="https://www.youtube.com/playlist?list=PLBExKBRRwO8UK9zWROGOVrcxzUHkWYpm_" target="_blank" rel="noopener" class="btn-ghost">Open on YouTube</a>
+      </div>
+    </div>
+
+    <div class="mic-visual">
+      <div class="mic-stage">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+
+        <div class="float-dot d1"></div>
+        <div class="float-dot d2"></div>
+        <div class="float-dot d3"></div>
+        <div class="float-dot d4"></div>
+
+        <div class="mic-body">
+          <svg class="mic-svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="100" cy="262" rx="58" ry="10" fill="#1c3a6e"/>
+            <rect x="96" y="190" width="8" height="68" fill="#1c3a6e"/>
+            <path d="M 50 130 Q 50 180 100 195 Q 150 180 150 130" stroke="#1c3a6e" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <rect x="55" y="30" width="90" height="140" rx="45" fill="#fbc02d" stroke="#1c3a6e" stroke-width="6"/>
+            <line x1="68" y1="55" x2="132" y2="55" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="70" x2="132" y2="70" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="85" x2="132" y2="85" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="100" x2="132" y2="100" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="115" x2="132" y2="115" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="130" x2="132" y2="130" stroke="#1c3a6e" stroke-width="3" stroke-linecap="round"/>
+            <rect x="55" y="140" width="90" height="14" fill="#f59021" stroke="#1c3a6e" stroke-width="6"/>
+            <ellipse cx="78" cy="60" rx="6" ry="22" fill="#fff" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EPISODES -->
+<section id="episodes" class="episodes-section section-cream-soft">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">All Episodes</span>
+      <h2 class="section-title">Listen, Learn, <em>Engage.</em></h2>
+      <p class="section-intro">Every episode is a chance to grow more confident in sharing the truths that matter. Click any tile to watch right here on the page.</p>
+    </div>
+
+    <div class="episodes-meta reveal">
+      <div class="episode-count"><strong id="ep-count">12</strong>Episodes</div>
+      <a href="https://www.youtube.com/playlist?list=PLBExKBRRwO8UK9zWROGOVrcxzUHkWYpm_" target="_blank" rel="noopener" class="btn-ghost">
+        Full Playlist
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+    </div>
+
+    <div class="episodes-grid reveal" id="episodes-grid">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- SUBSCRIBE STRIP -->
+<section class="subscribe-strip">
+  <div class="container">
+    <span class="section-tag">Don't miss an episode</span>
+    <h2 class="section-title">Subscribe on <em>YouTube.</em></h2>
+    <p class="sub-lead">Get notified every time a new conversation drops. Hit the bell, share with a friend, and keep the conversation going.</p>
+    <a href="https://www.youtube.com/playlist?list=PLBExKBRRwO8UK9zWROGOVrcxzUHkWYpm_" target="_blank" rel="noopener" class="yt-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      Subscribe on YouTube
+    </a>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Video player">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close video">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="lightbox-frame">
+      <iframe id="lightbox-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Redeeming Conversations<span class="dot">.</span></h4>
+        <p>Equipping Christians for tough conversations — so the gospel can travel through ordinary people in ordinary moments.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <p>
+          <a href="index.html#why">Why Conversations</a><br>
+          <a href="index.html#about">What We Do</a><br>
+          <a href="index.html#speakers">Our Speakers</a><br>
+          <a href="index.html#blog">Blog</a><br>
+          <a href="podcasts.html">Podcasts</a><br>
+          <a href="index.html#contact">Contact</a>
+        </p>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <p>Your gift helps equip Christians across Canada to share the gospel with confidence and grace.</p>
+        <a href="https://www.canadahelps.org/en/charities/jesus-great-commission-church-of-calgary/" target="_blank" rel="noopener" class="footer-donate">Donate →</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 redeemingconversations.ca — All Rights Reserved.</span>
+      <span>Made with conviction in Calgary, AB</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ===== Video list (in order provided) =====
+  // To reorder, just move IDs around in this array.
+  const VIDEOS = [
+    'Le2xNrg2wSI',
+    '9Djv2W3Zfeo',
+    '1xGHOA791cw',
+    'AKC0Er22fZs',
+    'iNad773kyIo',
+    'kZ3wOe5wkZA',
+    'kqphwtIPLV8',
+    'Q7lf6Bo5SsE',
+    '0S1g1Cf0ztU',
+    'DxydQf8kuw0',
+    'sCzaPTjUCUQ',
+    '9pXwTVQSP2s',
+    'LGxf4tJdADQ'
+    
+  ];
+
+  // ===== Scroll reveal =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ===== Lightbox =====
+  // YouTube's player throws Error 153 when an iframe's src is reassigned
+  // after the player has initialized. The fix is to destroy and recreate
+  // the iframe on every open/close.
+  const lightbox = document.getElementById('lightbox');
+  const lightboxFrame = document.querySelector('.lightbox-frame');
+  const lightboxCaption = document.getElementById('lightbox-caption');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  function buildIframe(src) {
+    const iframe = document.createElement('iframe');
+    iframe.id = 'lightbox-iframe';
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    if (src) iframe.src = src;
+    return iframe;
+  }
+
+  function replaceIframe(src) {
+    const old = document.getElementById('lightbox-iframe');
+    const fresh = buildIframe(src);
+    if (old) old.replaceWith(fresh); else lightboxFrame.appendChild(fresh);
+  }
+
+  function openLightbox(videoId, title) {
+    // Use youtube-nocookie + playsinline + autoplay for max embed compatibility
+    const src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&playsinline=1`;
+    replaceIframe(src);
+    lightboxCaption.textContent = title || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    replaceIframe(null); // empty iframe stops playback cleanly
+    document.body.style.overflow = '';
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+  });
+
+  // ===== Build episode tiles =====
+  const grid = document.getElementById('episodes-grid');
+  document.getElementById('ep-count').textContent = VIDEOS.length;
+
+  VIDEOS.forEach((videoId, i) => {
+    const epNum = i + 1;
+    const card = document.createElement('article');
+    card.className = 'episode-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.dataset.video = videoId;
+
+    // maxresdefault works for most videos; falls back to hqdefault if missing
+    const thumbHi = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+    const thumbLo = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+    card.innerHTML = `
+      <div class="episode-thumb">
+        <span class="episode-number">Ep ${String(epNum).padStart(2, '0')}</span>
+        <img src="${thumbHi}" alt="" loading="lazy"
+             onerror="if(this.src!=='${thumbLo}'){this.src='${thumbLo}';}">
+        <div class="play-overlay">
+          <div class="play-btn" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="episode-body">
+        <h3 class="episode-title loading" data-video="${videoId}" aria-label="Loading title…"></h3>
+        <span class="episode-watch">
+          Watch Episode
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    `;
+
+    const open = () => {
+      const titleEl = card.querySelector('.episode-title');
+      const title = titleEl.dataset.title || titleEl.textContent || `Episode ${epNum}`;
+      openLightbox(videoId, title);
+    };
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+
+    grid.appendChild(card);
+  });
+
+  // ===== Fetch titles via YouTube oEmbed (works without API key) =====
+  async function fetchTitle(videoId) {
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+    try {
+      const res = await fetch(oembedUrl);
+      if (!res.ok) throw new Error('oembed failed');
+      const data = await res.json();
+      return data.title || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function populateTitles() {
+    // Fetch in parallel for speed
+    const titleEls = document.querySelectorAll('.episode-title.loading');
+    await Promise.all(
+      Array.from(titleEls).map(async (el, i) => {
+        const videoId = el.dataset.video;
+        const title = await fetchTitle(videoId);
+        const fallback = `Episode ${i + 1}`;
+        const finalTitle = title || fallback;
+        el.textContent = finalTitle;
+        el.dataset.title = finalTitle;
+        el.classList.remove('loading');
+        el.removeAttribute('aria-label');
+      })
+    );
+  }
+
+  populateTitles();
+</script>
+
+</body>
+</html>
