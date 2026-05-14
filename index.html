@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Redeeming Conversations — Equipping Christians for Tough Conversations</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -777,15 +779,38 @@
   .read-more svg { transition: transform .25s ease; }
   .read-more.open svg { transform: rotate(180deg); }
 
-  /* ===== BLOG ===== */
-  .blog-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
+  /* ===== BLOG CAROUSEL ===== */
+  .blog-carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .carousel-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+    padding: 8px 4px 12px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE/Edge */
+    cursor: grab;
+  }
+
+  .carousel-viewport::-webkit-scrollbar { display: none; }   /* WebKit */
+  .carousel-viewport.grabbing { cursor: grabbing; }
+
+  .carousel-track {
+    display: flex;
+    gap: 24px;
     min-height: 200px;
+    width: max-content;
   }
 
   .blog-card {
+    flex: 0 0 320px;
     background: var(--white);
     border: 3px solid var(--navy);
     overflow: hidden;
@@ -793,8 +818,9 @@
     color: inherit;
     display: flex;
     flex-direction: column;
-    transition: all .3s cubic-bezier(.2, .8, .2, 1);
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s ease;
     position: relative;
+    user-select: none;
   }
 
   .blog-card::before {
@@ -809,7 +835,7 @@
   }
 
   .blog-card:hover {
-    transform: translate(-5px, -5px);
+    transform: translate(-4px, -4px);
     box-shadow: 6px 6px 0 var(--navy);
   }
 
@@ -837,7 +863,7 @@
   }
 
   .blog-body {
-    padding: 24px 26px 30px;
+    padding: 22px 24px 28px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -854,7 +880,7 @@
 
   .blog-title {
     font-family: 'Fraunces', serif;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 600;
     line-height: 1.25;
     color: var(--navy);
@@ -891,15 +917,69 @@
     color: var(--orange);
   }
 
+  /* Carousel buttons */
+  .carousel-btn {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--cream);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 0 var(--navy-deep);
+    transition: all .2s ease;
+  }
+
+  .carousel-btn:hover:not(:disabled) {
+    background: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--orange-deep);
+  }
+
+  .carousel-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--navy-deep);
+  }
+
+  .carousel-btn:disabled {
+    background: var(--cream-soft);
+    color: rgba(28, 58, 110, 0.3);
+    box-shadow: 0 4px 0 rgba(28, 58, 110, 0.15);
+    cursor: not-allowed;
+  }
+
+  .carousel-meta {
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  .carousel-counter {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  .carousel-counter strong {
+    color: var(--navy);
+    font-weight: 700;
+  }
+
   .blog-footer {
-    margin-top: 50px;
+    margin-top: 40px;
     text-align: center;
   }
 
   /* Loading / error states */
   .blog-loading,
   .blog-error {
-    grid-column: 1 / -1;
+    flex: 1;
     text-align: center;
     padding: 60px 20px;
     color: var(--ink-soft);
@@ -931,11 +1011,14 @@
   }
 
   @media (max-width: 980px) {
-    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    .blog-card { flex: 0 0 280px; }
+    .carousel-btn { width: 44px; height: 44px; }
   }
 
   @media (max-width: 640px) {
-    .blog-grid { grid-template-columns: 1fr; }
+    .blog-carousel { gap: 8px; }
+    .blog-card { flex: 0 0 78vw; }
+    .carousel-btn { width: 40px; height: 40px; }
   }
 
   /* ===== SUBSCRIBE ===== */
@@ -1377,12 +1460,26 @@
       <h2 class="section-title">Conversations That <em>Matter</em></h2>
       <p class="section-intro">Reflections, stories, and practical wisdom for engaging the culture around us.</p>
     </div>
-    <div id="blog-grid" class="blog-grid">
-      <div class="blog-loading">
-        <div class="blog-spinner"></div>
-        <p>Loading latest posts…</p>
+
+    <div class="blog-carousel" id="blog-carousel">
+      <button class="carousel-btn carousel-prev" id="carousel-prev" aria-label="Previous posts">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="carousel-viewport" id="carousel-viewport">
+        <div class="carousel-track" id="blog-track">
+          <div class="blog-loading">
+            <div class="blog-spinner"></div>
+            <p>Loading latest posts…</p>
+          </div>
+        </div>
       </div>
+
+      <button class="carousel-btn carousel-next" id="carousel-next" aria-label="Next posts">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
     </div>
+
     <div class="blog-footer reveal">
       <a href="https://jojoruba.substack.com" target="_blank" rel="noopener" class="btn-primary">
         View All on Substack
@@ -1535,59 +1632,228 @@
     });
   }
 
-  // Load Substack blog feed
+  // Load Substack blog feed — tries the full archive first, falls back to RSS
   async function loadBlogFeed() {
-    const grid = document.getElementById('blog-grid');
-    const FEED_URL = 'https://jojoruba.substack.com/feed';
-    const API_URL = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(FEED_URL);
+    const track = document.getElementById('blog-track');
+    const viewport = document.getElementById('carousel-viewport');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const SUBSTACK = 'https://jojoruba.substack.com';
+
+    const stripHtml = (html) => {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      return (tmp.textContent || tmp.innerText || '').trim();
+    };
+
+    const formatDate = (str) => {
+      try {
+        return new Date(str).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) { return ''; }
+    };
+
+    const cardHtml = (post) => {
+      const excerpt = (post.excerpt || '').slice(0, 160);
+      return `
+        <a href="${post.link}" target="_blank" rel="noopener" class="blog-card" draggable="false">
+          ${post.image ? `<div class="blog-thumb"><img src="${post.image}" alt="" loading="lazy" draggable="false"></div>` : ''}
+          <div class="blog-body">
+            <div class="blog-date">${formatDate(post.date)}</div>
+            <h3 class="blog-title">${post.title}</h3>
+            <p class="blog-excerpt">${excerpt}${excerpt.length === 160 ? '…' : ''}</p>
+            <span class="blog-link">Read on Substack →</span>
+          </div>
+        </a>
+      `;
+    };
+
+    const render = (posts) => {
+      // Triple the cards so the user can scroll in both directions and we can
+      // seamlessly loop by resetting to the middle copy.
+      const html = posts.map(cardHtml).join('');
+      track.innerHTML = html + html + html;
+      initCarousel();
+    };
+
+    function initCarousel() {
+      const AUTO_INTERVAL = 3000;
+      let autoTimer = null;
+      let suppressLoopCheck = false;
+
+      const cardStep = () => {
+        const card = track.querySelector('.blog-card');
+        if (!card) return 320;
+        const gap = parseFloat(getComputedStyle(track).gap) || 24;
+        return card.getBoundingClientRect().width + gap;
+      };
+
+      const oneSetWidth = () => track.scrollWidth / 3;
+
+      // Start in the middle so we can scroll both directions
+      const positionMiddle = () => {
+        const prev = viewport.style.scrollBehavior;
+        viewport.style.scrollBehavior = 'auto';
+        viewport.scrollLeft = oneSetWidth();
+        viewport.style.scrollBehavior = prev || 'smooth';
+      };
+
+      // Wait for layout, then center
+      requestAnimationFrame(() => requestAnimationFrame(positionMiddle));
+
+      // Seamless infinite loop — when we drift past the boundary,
+      // snap back by exactly one set width without animation.
+      viewport.addEventListener('scroll', () => {
+        if (suppressLoopCheck) return;
+        const w = oneSetWidth();
+        if (viewport.scrollLeft >= w * 2 - 1) {
+          suppressLoopCheck = true;
+          const prev = viewport.style.scrollBehavior;
+          viewport.style.scrollBehavior = 'auto';
+          viewport.scrollLeft -= w;
+          requestAnimationFrame(() => {
+            viewport.style.scrollBehavior = prev || 'smooth';
+            suppressLoopCheck = false;
+          });
+        } else if (viewport.scrollLeft <= 1) {
+          suppressLoopCheck = true;
+          const prev = viewport.style.scrollBehavior;
+          viewport.style.scrollBehavior = 'auto';
+          viewport.scrollLeft += w;
+          requestAnimationFrame(() => {
+            viewport.style.scrollBehavior = prev || 'smooth';
+            suppressLoopCheck = false;
+          });
+        }
+      }, { passive: true });
+
+      // Buttons
+      prevBtn.onclick = () => { viewport.scrollBy({ left: -cardStep(), behavior: 'smooth' }); restartAuto(); };
+      nextBtn.onclick = () => { viewport.scrollBy({ left:  cardStep(), behavior: 'smooth' }); restartAuto(); };
+
+      // Auto-advance
+      const startAuto = () => {
+        stopAuto();
+        autoTimer = setInterval(() => {
+          viewport.scrollBy({ left: cardStep(), behavior: 'smooth' });
+        }, AUTO_INTERVAL);
+      };
+      const stopAuto = () => { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } };
+      const restartAuto = () => { stopAuto(); startAuto(); };
+
+      // Pause on hover, resume on leave
+      const carousel = document.getElementById('blog-carousel');
+      carousel.addEventListener('mouseenter', stopAuto);
+      carousel.addEventListener('mouseleave', startAuto);
+
+      // Pause when tab is hidden
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopAuto(); else startAuto();
+      });
+
+      // Click & drag to scroll (desktop mouse)
+      let isDown = false, startX = 0, startScroll = 0, moved = 0;
+      viewport.addEventListener('mousedown', (e) => {
+        isDown = true;
+        moved = 0;
+        startX = e.pageX;
+        startScroll = viewport.scrollLeft;
+        viewport.classList.add('grabbing');
+        viewport.style.scrollBehavior = 'auto';
+        stopAuto();
+      });
+      viewport.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove('grabbing');
+        viewport.style.scrollBehavior = 'smooth';
+        startAuto();
+      });
+      viewport.addEventListener('mouseleave', () => {
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove('grabbing');
+        viewport.style.scrollBehavior = 'smooth';
+      });
+      viewport.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        moved = Math.abs(e.pageX - startX);
+        viewport.scrollLeft = startScroll - (e.pageX - startX);
+      });
+      // Prevent click-through after a real drag
+      viewport.addEventListener('click', (e) => {
+        if (moved > 8) { e.preventDefault(); e.stopPropagation(); }
+      }, true);
+
+      startAuto();
+    }
+
+    // ATTEMPT 1: Substack archive endpoint via CORS proxy (returns ALL posts)
+    const fetchArchive = async () => {
+      const allPosts = [];
+      let offset = 0;
+      const pageSize = 50;
+      // paginate up to 5 pages (250 posts) — plenty for a blog
+      for (let i = 0; i < 5; i++) {
+        const archiveUrl = `${SUBSTACK}/api/v1/archive?sort=new&limit=${pageSize}&offset=${offset}`;
+        const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(archiveUrl);
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error('proxy failed');
+        const data = await res.json();
+        const items = JSON.parse(data.contents);
+        if (!Array.isArray(items) || items.length === 0) break;
+        allPosts.push(...items);
+        if (items.length < pageSize) break;
+        offset += pageSize;
+      }
+      if (!allPosts.length) throw new Error('archive empty');
+      return allPosts.map(p => ({
+        title: p.title,
+        link: p.canonical_url,
+        date: p.post_date,
+        image: p.cover_image,
+        excerpt: stripHtml(p.subtitle || p.description || '')
+      }));
+    };
+
+    // ATTEMPT 2: RSS feed via rss2json (returns ~20 most recent)
+    const fetchRss = async () => {
+      const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(SUBSTACK + '/feed') + '&count=100';
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+      if (data.status !== 'ok' || !data.items || !data.items.length) throw new Error('rss empty');
+      return data.items.map(p => {
+        let image = p.thumbnail;
+        if (!image && p.enclosure && p.enclosure.link) image = p.enclosure.link;
+        if (!image) {
+          const m = (p.content || p.description || '').match(/<img[^>]+src="([^">]+)"/);
+          if (m) image = m[1];
+        }
+        return {
+          title: p.title,
+          link: p.link,
+          date: p.pubDate,
+          image,
+          excerpt: stripHtml(p.description || p.content || '')
+        };
+      });
+    };
 
     try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      if (data.status !== 'ok' || !data.items || !data.items.length) throw new Error('No items');
-
-      const posts = data.items.slice(0, 6);
-
-      const stripHtml = (html) => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return (tmp.textContent || tmp.innerText || '').trim();
-      };
-
-      const formatDate = (str) => {
-        try {
-          return new Date(str).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        } catch (e) { return ''; }
-      };
-
-      const extractImage = (item) => {
-        if (item.thumbnail) return item.thumbnail;
-        if (item.enclosure && item.enclosure.link) return item.enclosure.link;
-        const match = (item.content || item.description || '').match(/<img[^>]+src="([^">]+)"/);
-        return match ? match[1] : null;
-      };
-
-      grid.innerHTML = posts.map(post => {
-        const img = extractImage(post);
-        const excerpt = stripHtml(post.description || post.content || '').slice(0, 160);
-        return `
-          <a href="${post.link}" target="_blank" rel="noopener" class="blog-card">
-            ${img ? `<div class="blog-thumb"><img src="${img}" alt="" loading="lazy"></div>` : ''}
-            <div class="blog-body">
-              <div class="blog-date">${formatDate(post.pubDate)}</div>
-              <h3 class="blog-title">${post.title}</h3>
-              <p class="blog-excerpt">${excerpt}…</p>
-              <span class="blog-link">Read on Substack →</span>
-            </div>
-          </a>
+      const posts = await fetchArchive();
+      render(posts);
+    } catch (e1) {
+      try {
+        const posts = await fetchRss();
+        render(posts);
+      } catch (e2) {
+        track.innerHTML = `
+          <div class="blog-error">
+            <p>Posts couldn't load right now. <a href="${SUBSTACK}" target="_blank" rel="noopener">Visit the Substack directly →</a></p>
+          </div>
         `;
-      }).join('');
-    } catch (err) {
-      grid.innerHTML = `
-        <div class="blog-error">
-          <p>Posts couldn't load right now. <a href="https://jojoruba.substack.com" target="_blank" rel="noopener">Visit the Substack directly →</a></p>
-        </div>
-      `;
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+      }
     }
   }
 
