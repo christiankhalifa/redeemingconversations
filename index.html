@@ -1486,7 +1486,7 @@
     <h2 class="section-title">Stay in the <em>conversation.</em></h2>
     <p class="sub-lead">Sign up to receive our regular prayer letter and updates.</p>
     <form class="subscribe-form" id="subscribe-form">
-      <input type="email" placeholder="your@email.com" required>
+      <input type="email" name="email" placeholder="your@email.com" required>
       <button type="submit">Sign Up</button>
     </form>
   </div>
@@ -1510,10 +1510,10 @@
         </div>
       </div>
       <form class="contact-form reveal" id="contact-form">
-        <input type="text" placeholder="Name" required>
-        <input type="email" placeholder="Email" required>
-        <input type="tel" placeholder="Phone (optional)">
-        <textarea placeholder="Other notes…"></textarea>
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone (optional)">
+        <textarea name="notes" placeholder="Other notes…"></textarea>
         <button type="submit" class="btn-primary">
           Send Message
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -1596,23 +1596,79 @@
     });
   });
 
-  // Subscribe form feedback
+  // ============================================================
+  //  GOOGLE SHEETS FORM HANDLING
+  //  Paste your deployed Apps Script Web App URL below.
+  //  (See SETUP-google-sheets.md for step-by-step instructions.)
+  // ============================================================
+  const SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbydpDp1cXwCPSz0fc-aBsLOhK969TA45hHSbS5RmNPkjhylFAQbHkdIqvhAwU0giqAU/exec';
+
+  function sendToSheets(payload) {
+    // Sent as a plain string body (text/plain) so the browser does NOT
+    // trigger a CORS preflight, which Apps Script web apps don't support.
+    return fetch(SHEETS_ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }).then(r => r.json());
+  }
+
+  // Subscribe form -> "Subscribers" sheet
   document.getElementById('subscribe-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.textContent = '✓ Thank You';
-    btn.style.background = 'var(--yellow)';
-    btn.style.color = 'var(--navy)';
-    e.target.querySelector('input').value = '';
+    const form = e.target;
+    const btn = form.querySelector('button');
+    const email = form.querySelector('input[name="email"]').value.trim();
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    sendToSheets({ formType: 'subscribe', email })
+      .then((res) => {
+        if (res && res.result === 'success') {
+          btn.textContent = '✓ Thank You';
+          btn.style.background = 'var(--yellow)';
+          btn.style.color = 'var(--navy)';
+          form.querySelector('input').value = '';
+        } else {
+          throw new Error('Server error');
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+      });
   });
 
-  // Contact form feedback
+  // Contact form -> "Contacts" sheet
   document.getElementById('contact-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.innerHTML = '✓ Message Sent';
-    btn.style.background = 'var(--orange)';
-    e.target.querySelectorAll('input, textarea').forEach(f => f.value = '');
+    const form = e.target;
+    const btn = form.querySelector('button');
+    const payload = {
+      formType: 'contact',
+      name: form.querySelector('input[name="name"]').value.trim(),
+      email: form.querySelector('input[name="email"]').value.trim(),
+      phone: form.querySelector('input[name="phone"]').value.trim(),
+      notes: form.querySelector('textarea[name="notes"]').value.trim()
+    };
+
+    btn.disabled = true;
+    btn.innerHTML = 'Sending…';
+
+    sendToSheets(payload)
+      .then((res) => {
+        if (res && res.result === 'success') {
+          btn.innerHTML = '✓ Message Sent';
+          btn.style.background = 'var(--orange)';
+          form.querySelectorAll('input, textarea').forEach(f => f.value = '');
+        } else {
+          throw new Error('Server error');
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Try Again';
+      });
   });
 
   // Subtle parallax on campfire (desktop only)
