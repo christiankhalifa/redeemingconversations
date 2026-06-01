@@ -687,9 +687,9 @@
   /* ===== SPEAKERS ===== */
   .speakers {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 28px;
-    max-width: 1100px;
+    max-width: 720px;
     margin: 0 auto;
   }
 
@@ -1296,10 +1296,6 @@
   .reveal-stagger.visible > *:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: .45s; }
 
   /* ===== RESPONSIVE ===== */
-  @media (max-width: 1024px) {
-    .speakers { grid-template-columns: repeat(2, 1fr); max-width: 720px; }
-  }
-
   @media (max-width: 880px) {
     .hero { padding: 60px 0 80px; }
     .hero-grid { grid-template-columns: 1fr; gap: 50px; }
@@ -1449,8 +1445,8 @@
         </div>
         <div class="speaker-info">
           <h3 class="speaker-name">Suresh Paul</h3>
-          <div class="speaker-role">Apologist &amp; Speaker</div>
-          <p class="speaker-bio collapsed">Suresh is a Christian apologist and polemicist who engages a wide range of worldviews, with a primary focus on Islam. He is currently pursuing a master's in apologetics and polemics to Islam under Dr. Jay Smith, with particular attention to questions surrounding the historicity of Muhammad, the existence of Mecca, and the sources and compilation of the Qur'an. Suresh is passionate about defending the historic Christian faith — especially the deity of Christ and the authority of the Bible as the word of God. He has participated in public debates, taught in churches, and regularly takes the gospel to the streets through evangelism, equipping believers to give a thoughtful and reasoned defense of what they believe.</p>
+          <div class="speaker-role">Apologist &amp; Debater</div>
+          <p class="speaker-bio collapsed">Jocelynn articulately speaks truth into the darkness, seeking to dispel the lies that keep people from Jesus. Having once dealt with her own gender confusion, she now shares how she was radically transformed by the love of Christ. She has an evangelistic heart for the LGBTQ community and those hurt by the trauma of abortion — pointing people to the healing available in Christ, knowing it is His kindness that leads to repentance. She speaks one-on-one, or in small or large groups, both in a formal and casual capacity.</p>
           <button class="read-more" type="button">
             <span>Read More</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
