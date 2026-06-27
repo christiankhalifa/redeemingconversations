@@ -1622,48 +1622,6 @@
   // ============================================================
   const SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbydpDp1cXwCPSz0fc-aBsLOhK969TA45hHSbS5RmNPkjhylFAQbHkdIqvhAwU0giqAU/exec';
 
-  // ============================================================
-  //  MAILCHIMP SIGNUP
-  //  Paste the "action" URL from your Mailchimp embedded form below.
-  //  Find it in Mailchimp:  Audience  ->  Signup forms  ->
-  //  Embedded forms  ->  copy the URL inside <form action="...">
-  //  It looks like:
-  //  https://YOURNAME.usXX.list-manage.com/subscribe/post?u=abc123&id=def456
-  //  Everything else (data center, user id, list id, honeypot) is
-  //  derived automatically from this one URL.
-  // ============================================================
-  const MAILCHIMP_URL = 'https://yahoo.us8.list-manage.com/subscribe/post?u=aa1c637f5a15a08ecf6d1d702&id=fae6f29553&f_id=00c4d2e2f0';
-
-  // Submits an email to Mailchimp via JSONP (no page reload, no backend,
-  // no CORS issues — works on static GitHub Pages hosting).
-  function sendToMailchimp(email) {
-    return new Promise((resolve, reject) => {
-      let base, u, id;
-      try {
-        const parsed = new URL(MAILCHIMP_URL);
-        u = parsed.searchParams.get('u');
-        id = parsed.searchParams.get('id');
-        base = MAILCHIMP_URL.replace('/post?', '/post-json?');
-      } catch (err) {
-        return reject(new Error('Bad Mailchimp URL'));
-      }
-
-      const cb = 'mc_cb_' + Date.now();
-      const params = new URLSearchParams();
-      params.set('EMAIL', email);
-      if (u && id) params.set('b_' + u + '_' + id, ''); // honeypot (left empty)
-      params.set('c', cb);
-
-      const script = document.createElement('script');
-      const cleanup = () => { delete window[cb]; script.remove(); };
-
-      window[cb] = (data) => { cleanup(); resolve(data || {}); };
-      script.onerror = () => { cleanup(); reject(new Error('Network error')); };
-      script.src = base + (base.includes('?') ? '&' : '?') + params.toString();
-      document.body.appendChild(script);
-    });
-  }
-
   function sendToSheets(payload) {
     // Sent as a plain string body (text/plain) so the browser does NOT
     // trigger a CORS preflight, which Apps Script web apps don't support.
@@ -1673,7 +1631,7 @@
     }).then(r => r.json());
   }
 
-  // Subscribe form -> Mailchimp audience
+  // Subscribe form -> "Subscribers" sheet
   document.getElementById('subscribe-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target;
@@ -1683,12 +1641,7 @@
     btn.disabled = true;
     btn.textContent = 'Sending…';
 
-    const showError = (label) => {
-      btn.disabled = false;
-      btn.textContent = label || 'Try Again';
-    };
-
-    sendToMailchimp(email)
+    sendToSheets({ formType: 'subscribe', email })
       .then((res) => {
         if (res && res.result === 'success') {
           btn.textContent = '✓ Thank You';
@@ -1696,20 +1649,13 @@
           btn.style.color = 'var(--navy)';
           form.querySelector('input').value = '';
         } else {
-          // Mailchimp returns result:'error' for things like an address
-          // that's already subscribed — treat that as a friendly success.
-          const msg = (res && res.msg ? res.msg : '').toLowerCase();
-          if (msg.includes('already')) {
-            btn.textContent = '✓ Already Subscribed';
-            btn.style.background = 'var(--yellow)';
-            btn.style.color = 'var(--navy)';
-            form.querySelector('input').value = '';
-          } else {
-            showError();
-          }
+          throw new Error('Server error');
         }
       })
-      .catch(() => showError());
+      .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+      });
   });
 
   // Contact form -> "Contacts" sheet
